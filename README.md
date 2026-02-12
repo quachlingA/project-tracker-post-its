@@ -25,13 +25,3 @@ No build step or server required. Data is stored in your browser’s local stora
 3. On the **Board**, pick a workstream, then drag cards between columns.
 4. On the **Dashboard**, set a “Done” goal per workstream and mark whether you met it this week.
 5. Use **Actions → Export backup** periodically; use **Import backup** to restore on another machine or after clearing the browser.
-
-## Tech
-
-- Plain HTML, CSS, and JavaScript. No frameworks.
-- Data: `localStorage` (keys prefixed with `todo-tracker-*` for compatibility).
-- Font: [DM Sans](https://fonts.google.com/specimen/DM+Sans) (Google Fonts).
-
-## License
-
-MIT. Use and modify as you like.
