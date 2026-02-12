@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Its</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Post-Its</h1>
+      <nav class="main-tabs" aria-label="Main navigation">
+        <button type="button" class="main-tab active" data-main-view="dashboard">Dashboard</button>
+        <button type="button" class="main-tab" data-main-view="board">Board</button>
+      </nav>
+      <div class="header-actions">
+        <div class="board-header-area" id="board-header-area">
+          <div class="workstream-group">
+            <div class="workstream-picker-wrap">
+              <span class="workstream-picker-label">Workstream</span>
+              <div class="workstream-picker" id="workstream-picker">
+                <button type="button" class="workstream-picker-trigger" id="workstream-picker-trigger" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="workstream-picker-trigger-color" id="workstream-trigger-color"></span>
+                  <span class="workstream-picker-trigger-name" id="workstream-trigger-name">—</span>
+                  <span class="workstream-picker-chevron">▼</span>
+                </button>
+                <div class="workstream-picker-dropdown" id="workstream-picker-dropdown" role="listbox" aria-hidden="true"></div>
+              </div>
+            </div>
+            <button type="button" class="btn btn-ghost btn-sm" id="edit-current-tracker-btn" title="Edit workstream">✏️</button>
+          </div>
+          <div class="filter-group header-filter">
+            <label for="date-filter">Show items from</label>
+            <select id="date-filter">
+              <option value="all">All time</option>
+              <option value="7">Past week</option>
+              <option value="14">Past 2 weeks</option>
+              <option value="30">Past month</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions-menu" id="actions-menu">
+          <button type="button" class="actions-menu-trigger" id="actions-menu-trigger" aria-haspopup="menu" aria-expanded="false" title="Actions">
+            Actions <span class="actions-menu-chevron">▼</span>
+          </button>
+          <div class="actions-menu-dropdown" id="actions-menu-dropdown" role="menu" aria-hidden="true">
+            <button type="button" class="actions-menu-item" role="menuitem" data-action="add-item">+ Add item</button>
+            <button type="button" class="actions-menu-item" role="menuitem" data-action="add-column">+ Add column</button>
+            <button type="button" class="actions-menu-item" role="menuitem" data-action="add-workstream">+ Add workstream</button>
+            <div class="actions-menu-divider" aria-hidden="true"></div>
+            <button type="button" class="actions-menu-item" role="menuitem" data-action="export">Export backup</button>
+            <button type="button" class="actions-menu-item" role="menuitem" data-action="import">Import backup</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="theme-toggle" title="Toggle light/dark">
+          <span class="icon-sun" aria-hidden="true">☀️</span>
+          <span class="icon-moon" aria-hidden="true">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Import backup modal with directions -->
+    <dialog class="modal" id="import-modal" aria-labelledby="import-modal-title">
+      <div class="import-modal-content">
+        <h2 id="import-modal-title">Import backup</h2>
+        <div class="import-directions">
+          <p><strong>How to import your saved data:</strong></p>
+          <ol>
+            <li>Click <strong>Choose file</strong> below and select your Post-Its backup file (the <code>.json</code> file you exported).</li>
+            <li>Click <strong>Import</strong> to replace the current data with the backup. The page will reload so everything matches the imported state.</li>
+          </ol>
+          <p class="import-warning">Importing will overwrite all current items, workstreams, columns, and settings. Export a backup first if you want to keep the current state.</p>
+        </div>
+        <div class="import-file-row">
+          <input type="file" id="import-file-input" accept=".json,application/json" class="import-file-input" />
+          <label for="import-file-input" class="btn btn-secondary">Choose file</label>
+          <span class="import-file-name" id="import-file-name">No file chosen</span>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="import-cancel">Cancel</button>
+          <button type="button" class="btn btn-primary" id="import-confirm" disabled>Import</button>
+        </div>
+      </div>
+    </dialog>
+
+    <nav class="view-tabs" id="tracker-view-tabs">
+      <button type="button" class="tab active" data-view="board">Board</button>
+      <button type="button" class="tab" data-view="backlog">Backlog</button>
+    </nav>
+
+    <main class="main">
+      <!-- Dashboard: overview of all categories -->
+      <section class="view view-dashboard hidden" id="view-dashboard">
+        <div class="dashboard-header">
+          <div class="dashboard-header-row">
+            <div>
+              <h2>Overview</h2>
+              <p class="dashboard-desc">Metrics by workstream. Set a goal for how many items you want in Done.</p>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-kpi" id="dashboard-kpi"></div>
+        <h3 class="dashboard-section-title">Workstream breakdown</h3>
+        <div class="dashboard-grid" id="dashboard-grid"></div>
+        <h3 class="dashboard-section-title">Goals & weekly tracker</h3>
+        <div class="dashboard-goals" id="dashboard-goals"></div>
+      </section>
+
+      <!-- Backlog view: items without status or priority -->
+      <section class="view view-backlog hidden" id="view-backlog">
+        <div class="backlog-header">
+          <h2>Backlog</h2>
+          <p class="backlog-desc">Items without a status or priority are shown here.</p>
+        </div>
+        <div class="backlog-list" id="backlog-list" data-column-id="backlog"></div>
+        <div class="backlog-footer">
+          <button type="button" class="btn btn-column-add" id="backlog-add-btn">+ Add item to backlog</button>
+        </div>
+      </section>
+
+      <!-- Board view: columns -->
+      <section class="view view-board" id="view-board">
+        <div class="board" id="board"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Add/Edit item -->
+  <dialog class="modal" id="item-modal">
+    <div class="modal-content">
+      <h2 id="modal-title">Add item</h2>
+      <form id="item-form">
+        <input type="hidden" id="item-id" />
+        <div class="field">
+          <label for="item-name">Name *</label>
+          <input type="text" id="item-name" required placeholder="Task name" />
+        </div>
+        <div class="field">
+          <label for="item-priority">Priority</label>
+          <select id="item-priority">
+            <option value="">— Not set —</option>
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="item-status">Status</label>
+          <select id="item-status"></select>
+        </div>
+        <div class="field">
+          <label for="item-due-date">Due date (optional)</label>
+          <input type="date" id="item-due-date" />
+        </div>
+        <div class="field">
+          <label for="item-notes">Notes (optional)</label>
+          <textarea id="item-notes" rows="3" placeholder="Notes…"></textarea>
+        </div>
+        <div class="field">
+          <label for="item-stakeholders">Stakeholders (optional)</label>
+          <input type="text" id="item-stakeholders" placeholder="e.g. Alice, Bob" />
+        </div>
+        <div class="field">
+          <label>Resources (optional)</label>
+          <p class="field-hint">Add links to docs, designs, or related resources.</p>
+          <div class="resources-list" id="item-resources-list"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="item-resources-add">+ Add link</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal: Item detail (changelog, timestamps) -->
+  <dialog class="modal modal-detail" id="detail-modal">
+    <div class="modal-content">
+      <h2 class="detail-name" id="detail-name"></h2>
+      <div class="detail-meta">
+        <span class="detail-priority" id="detail-priority"></span>
+        <span class="detail-created" id="detail-created"></span>
+        <span class="detail-due" id="detail-due"></span>
+      </div>
+      <div class="detail-section" id="detail-notes-wrap">
+        <h3>Notes</h3>
+        <p id="detail-notes" class="detail-notes"></p>
+      </div>
+      <div class="detail-section" id="detail-stakeholders-wrap">
+        <h3>Stakeholders</h3>
+        <p id="detail-stakeholders" class="detail-stakeholders"></p>
+      </div>
+      <div class="detail-section" id="detail-resources-wrap">
+        <h3>Resources</h3>
+        <ul class="detail-resources" id="detail-resources"></ul>
+      </div>
+      <div class="detail-section">
+        <h3>Status history</h3>
+        <ul class="status-history" id="detail-status-history"></ul>
+      </div>
+      <div class="detail-section">
+        <h3>Changelog</h3>
+        <ul class="changelog" id="detail-changelog"></ul>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="detail-edit">Edit</button>
+        <button type="button" class="btn btn-primary" id="detail-close">Close</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Modal: Add/Edit tracker (workstream) -->
+  <dialog class="modal" id="tracker-modal">
+    <div class="modal-content">
+      <h2 id="tracker-modal-title">Add workstream</h2>
+      <form id="tracker-form">
+        <input type="hidden" id="tracker-edit-id" />
+        <div class="field">
+          <label for="tracker-name">Workstream name *</label>
+          <input type="text" id="tracker-name" required placeholder="e.g. Work, Personal" />
+        </div>
+        <div class="field">
+          <label for="tracker-color">Color</label>
+          <input type="color" id="tracker-color" value="#bfdbfe" />
+          <p class="field-hint">Identifies this workstream and is used as a subtle app background when you have it selected on the Board.</p>
+        </div>
+        <div class="field">
+          <label for="tracker-goal">Completion goal (optional)</label>
+          <input type="number" id="tracker-goal" min="0" step="1" placeholder="e.g. 5" />
+          <p class="field-hint">Target number of items to have in Done.</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="tracker-delete" style="display: none;">Delete workstream</button>
+          <span class="modal-actions-spacer"></span>
+          <button type="button" class="btn btn-ghost" id="tracker-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Modal: Delete tracker confirm -->
+  <dialog class="modal" id="tracker-delete-modal">
+    <div class="modal-content">
+      <h2>Delete workstream</h2>
+      <p id="tracker-delete-message"></p>
+      <div class="field" id="tracker-delete-move-wrap">
+        <label for="tracker-delete-move-to">Move items to</label>
+        <select id="tracker-delete-move-to"></select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="tracker-delete-cancel">Cancel</button>
+        <button type="button" class="btn btn-ghost" id="tracker-delete-all">Delete all items</button>
+        <button type="button" class="btn btn-primary" id="tracker-delete-move">Move & delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Modal: Add/Edit column -->
+  <dialog class="modal" id="column-modal">
+    <div class="modal-content">
+      <h2 id="column-modal-title">Add column</h2>
+      <form id="column-form">
+        <input type="hidden" id="column-edit-id" />
+        <div class="field">
+          <label for="column-name">Column name *</label>
+          <input type="text" id="column-name" required placeholder="e.g. Review" />
+        </div>
+        <div class="field">
+          <label for="column-color">Color</label>
+          <input type="color" id="column-color" value="#c4b5fd" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="column-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save column</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
