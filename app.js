@@ -7,6 +7,7 @@
   const STORAGE_CURRENT_TRACKER = 'todo-tracker-current';
   const STORAGE_MAIN_VIEW = 'todo-tracker-main-view';
   const STORAGE_THEME = 'todo-tracker-theme';
+  const STORAGE_WELCOME_SEEN = 'post-its-welcome-seen';
   const DEFAULT_TRACKER_COLOR = '#bfdbfe';
 
   const BACKLOG_COLUMN_ID = '';
@@ -909,11 +910,6 @@
       card.innerHTML = `
         <div class="dashboard-card-header" style="background: ${escapeAttr(color)}; color: inherit;">${escapeHtml(tracker.name)}</div>
         <div class="dashboard-card-body">
-          <div class="dashboard-metrics">
-            <div class="dashboard-metric"><span>Backlog</span><span class="count">${m.backlogCount}</span></div>
-            ${sortedColumns.map((c) => `<div class="dashboard-metric"><span>${escapeHtml(c.name)}</span><span class="count">${m.byStatus[c.id] || 0}</span></div>`).join('')}
-            <div class="dashboard-metric"><span>Total</span><span class="count">${m.total}</span></div>
-          </div>
           ${chartsHtml}
           ${goalNum != null ? `
           <div class="dashboard-goal">
@@ -1116,6 +1112,11 @@
     document.documentElement.style.setProperty('--workstream-tint', tint);
   }
 
+  function showWelcomeModal() {
+    const modal = document.getElementById('welcome-modal');
+    if (modal) modal.showModal();
+  }
+
   function init() {
     loadItems();
     loadTrackers();
@@ -1124,6 +1125,17 @@
     loadColumns();
     initTheme();
     setupBacklogDrop();
+
+    const welcomeModal = document.getElementById('welcome-modal');
+    const welcomeDismiss = document.getElementById('welcome-dismiss');
+    if (welcomeDismiss && welcomeModal) {
+      welcomeDismiss.addEventListener('click', () => {
+        welcomeModal.close();
+        try { localStorage.setItem(STORAGE_WELCOME_SEEN, '1'); } catch (_) {}
+      });
+    }
+    document.getElementById('help-btn').addEventListener('click', showWelcomeModal);
+    if (!localStorage.getItem(STORAGE_WELCOME_SEEN)) showWelcomeModal();
 
     document.getElementById('backlog-add-btn').addEventListener('click', () => openAddModal());
     setupActionsMenu();

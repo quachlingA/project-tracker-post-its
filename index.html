@@ -56,12 +56,34 @@
             <button type="button" class="actions-menu-item" role="menuitem" data-action="import">Import backup</button>
           </div>
         </div>
+        <button type="button" class="btn btn-ghost" id="help-btn" title="Getting started">?</button>
         <button type="button" class="btn btn-ghost" id="theme-toggle" title="Toggle light/dark">
           <span class="icon-sun" aria-hidden="true">☀️</span>
           <span class="icon-moon" aria-hidden="true">🌙</span>
         </button>
       </div>
     </header>
+
+    <!-- Welcome / Getting started modal (for new users and Help) -->
+    <dialog class="modal" id="welcome-modal" aria-labelledby="welcome-modal-title">
+      <div class="welcome-modal-content">
+        <h2 id="welcome-modal-title">Welcome to Post-Its</h2>
+        <p class="welcome-intro">Post-Its is a simple task board that runs in your browser. Organize work by workstreams, drag cards across columns, and track goals—all without signing in. Your data stays in this browser until you export it.</p>
+        <div class="welcome-section">
+          <h3>How to get started</h3>
+          <ol class="welcome-steps">
+            <li><strong>Add a workstream</strong> (e.g. Work, Personal) via <strong>Actions → + Add workstream</strong> or the workstream dropdown at the bottom.</li>
+            <li><strong>Add items</strong> with <strong>Actions → + Add item</strong>. Give them a name, priority, and status (or leave blank to keep them in Backlog).</li>
+            <li>On the <strong>Board</strong>, drag cards between columns (Backlog, To Do, In Progress, Done). Add more columns with <strong>Actions → + Add column</strong> if you like.</li>
+            <li>Use the <strong>Dashboard</strong> to see KPIs, donut charts per workstream, and optional goals with a weekly “goal met” tracker.</li>
+            <li><strong>Export a backup</strong> (Actions → Export backup) so you don’t lose data if you clear the browser. Use <strong>Import backup</strong> to restore later.</li>
+          </ol>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-primary" id="welcome-dismiss">Get started</button>
+        </div>
+      </div>
+    </dialog>
 
     <!-- Import backup modal with directions -->
     <dialog class="modal" id="import-modal" aria-labelledby="import-modal-title">
