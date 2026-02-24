@@ -31,15 +31,24 @@
                 <div class="workstream-picker-dropdown" id="workstream-picker-dropdown" role="listbox" aria-hidden="true"></div>
               </div>
             </div>
-            <button type="button" class="btn btn-ghost btn-sm" id="edit-current-tracker-btn" title="Edit workstream">✏️</button>
           </div>
           <div class="filter-group header-filter">
-            <label for="date-filter">Show items from</label>
-            <select id="date-filter">
+            <label for="date-filter">Show done items from</label>
+            <select id="date-filter" class="header-select">
               <option value="all">All time</option>
+              <option value="this-week">This week</option>
               <option value="7">Past week</option>
               <option value="14">Past 2 weeks</option>
               <option value="30">Past month</option>
+            </select>
+          </div>
+          <div class="filter-group header-filter">
+            <label for="sort-by">Sort by</label>
+            <select id="sort-by" class="header-select">
+              <option value="default">Default</option>
+              <option value="created">Created date</option>
+              <option value="priority">Priority</option>
+              <option value="name">Name</option>
             </select>
           </div>
         </div>
@@ -51,6 +60,7 @@
             <button type="button" class="actions-menu-item" role="menuitem" data-action="add-item">+ Add item</button>
             <button type="button" class="actions-menu-item" role="menuitem" data-action="add-column">+ Add column</button>
             <button type="button" class="actions-menu-item" role="menuitem" data-action="add-workstream">+ Add workstream</button>
+            <button type="button" class="actions-menu-item" role="menuitem" data-action="edit-workstream">Edit workstream</button>
             <div class="actions-menu-divider" aria-hidden="true"></div>
             <button type="button" class="actions-menu-item" role="menuitem" data-action="export">Export backup</button>
             <button type="button" class="actions-menu-item" role="menuitem" data-action="import">Import backup</button>
@@ -117,6 +127,7 @@
     <main class="main">
       <!-- Dashboard: overview of all categories -->
       <section class="view view-dashboard hidden" id="view-dashboard">
+        <div class="dashboard-inspiration-wrap" id="dashboard-inspiration-wrap"></div>
         <div class="dashboard-header">
           <div class="dashboard-header-row">
             <div>
@@ -194,6 +205,8 @@
           <button type="button" class="btn btn-ghost btn-sm" id="item-resources-add">+ Add link</button>
         </div>
         <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="item-delete" style="display: none;">Delete</button>
+          <span class="modal-actions-spacer"></span>
           <button type="button" class="btn btn-ghost" id="modal-cancel">Cancel</button>
           <button type="submit" class="btn btn-primary">Save</button>
         </div>
@@ -209,6 +222,7 @@
         <span class="detail-priority" id="detail-priority"></span>
         <span class="detail-created" id="detail-created"></span>
         <span class="detail-due" id="detail-due"></span>
+        <span class="detail-done" id="detail-done"></span>
       </div>
       <div class="detail-section" id="detail-notes-wrap">
         <h3>Notes</h3>
@@ -231,6 +245,7 @@
         <ul class="changelog" id="detail-changelog"></ul>
       </div>
       <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="detail-delete">Delete</button>
         <button type="button" class="btn btn-ghost" id="detail-edit">Edit</button>
         <button type="button" class="btn btn-primary" id="detail-close">Close</button>
       </div>

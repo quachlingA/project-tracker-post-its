@@ -7,8 +7,157 @@
   const STORAGE_CURRENT_TRACKER = 'todo-tracker-current';
   const STORAGE_MAIN_VIEW = 'todo-tracker-main-view';
   const STORAGE_THEME = 'todo-tracker-theme';
+  const STORAGE_SORT_BY = 'todo-tracker-sort-by';
   const STORAGE_WELCOME_SEEN = 'post-its-welcome-seen';
   const DEFAULT_TRACKER_COLOR = '#bfdbfe';
+
+  /** Inspirational "did you know" facts: person did X at age Y (young achievers). What are you gonna do? */
+  const INSPIRATIONAL_FACTS = [
+    { person: 'Malala Yousafzai', achievement: 'won the Nobel Peace Prize', age: 17 },
+    { person: 'Louis Braille', achievement: 'invented the Braille reading system', age: 15 },
+    { person: 'Anne Frank', achievement: 'wrote her diary that would inspire millions', age: 13 },
+    { person: 'Mozart', achievement: 'composed his first symphony', age: 8 },
+    { person: 'Steve Jobs', achievement: 'co-founded Apple', age: 21 },
+    { person: 'Bill Gates', achievement: 'founded Microsoft', age: 20 },
+    { person: 'Mark Zuckerberg', achievement: 'launched Facebook', age: 19 },
+    { person: 'Mary Shelley', achievement: 'wrote Frankenstein', age: 18 },
+    { person: 'Emma Watson', achievement: 'landed the role of Hermione in Harry Potter', age: 9 },
+    { person: 'Shirley Temple', achievement: 'won an Academy Award', age: 6 },
+    { person: 'Pablo Picasso', achievement: 'painted his first major work', age: 15 },
+    { person: 'Tiger Woods', achievement: 'won the U.S. Junior Amateur championship', age: 15 },
+    { person: 'Greta Thunberg', achievement: 'addressed the UN Climate Action Summit', age: 16 },
+    { person: 'Elon Musk', achievement: 'sold his first video game', age: 12 },
+    { person: 'Oprah Winfrey', achievement: 'got her first job in radio', age: 16 },
+    { person: 'Beyoncé', achievement: 'formed Destiny\'s Child', age: 9 },
+    { person: 'Lady Gaga', achievement: 'played open mics in New York', age: 14 },
+    { person: 'Taylor Swift', achievement: 'signed her first record deal', age: 15 },
+    { person: 'Justin Bieber', achievement: 'was discovered on YouTube', age: 12 },
+    { person: 'Albert Einstein', achievement: 'wrote his first scientific paper', age: 16 },
+    { person: 'Marie Curie', achievement: 'graduated from high school at the top of her class', age: 15 },
+    { person: 'Ada Lovelace', achievement: 'designed the first algorithm for a computer', age: 27 },
+    { person: 'Orville Wright', achievement: 'built and sold kites with his brother', age: 7 },
+    { person: 'Thomas Edison', achievement: 'set up his first lab in a train car', age: 12 },
+    { person: 'Nikola Tesla', achievement: 'invented a device to catch frogs', age: 5 },
+    { person: 'Neil Armstrong', achievement: 'earned his pilot\'s license', age: 16 },
+    { person: 'Sally Ride', achievement: 'became the first American woman in space', age: 32 },
+    { person: 'Maya Angelou', achievement: 'wrote her first poem', age: 9 },
+    { person: 'Zendaya', achievement: 'starred in Disney\'s Shake It Up', age: 14 },
+    { person: 'Millie Bobby Brown', achievement: 'was cast in Stranger Things', age: 12 },
+    { person: 'Simone Biles', achievement: 'won her first national all-around title', age: 16 },
+    { person: 'Serena Williams', achievement: 'won her first major tennis title', age: 17 },
+    { person: 'Venus Williams', achievement: 'turned professional in tennis', age: 14 },
+    { person: 'Michael Phelps', achievement: 'competed in his first Olympics', age: 15 },
+    { person: 'Usain Bolt', achievement: 'won his first Olympic gold', age: 22 },
+    { person: 'Jackie Robinson', achievement: 'lettered in four sports in high school', age: 17 },
+    { person: 'Pelé', achievement: 'won his first World Cup', age: 17 },
+    { person: 'Lionel Messi', achievement: 'signed with FC Barcelona', age: 13 },
+    { person: 'Cristiano Ronaldo', achievement: 'signed with Sporting CP', age: 12 },
+    { person: 'Kobe Bryant', achievement: 'was drafted to the NBA', age: 17 },
+    { person: 'LeBron James', achievement: 'appeared on the cover of Sports Illustrated', age: 17 },
+    { person: 'Stephen Curry', achievement: 'led his high school to state playoffs', age: 18 },
+    { person: 'Bobby Fischer', achievement: 'became the youngest grandmaster in chess', age: 15 },
+    { person: 'Judit Polgár', achievement: 'defeated a grandmaster in chess', age: 10 },
+    { person: 'Magnus Carlsen', achievement: 'became a chess grandmaster', age: 13 },
+    { person: 'Pharrell Williams', achievement: 'formed his first band', age: 12 },
+    { person: 'Bruno Mars', achievement: 'performed as Little Elvis in Hawaii', age: 4 },
+    { person: 'Adele', achievement: 'enrolled at the BRIT School', age: 14 },
+    { person: 'Ed Sheeran', achievement: 'moved to London to pursue music', age: 16 },
+    { person: 'Billie Eilish', achievement: 'released her first single', age: 15 },
+    { person: 'Olivia Rodrigo', achievement: 'released drivers license', age: 17 },
+    { person: 'Tim Berners-Lee', achievement: 'built his first computer', age: 18 },
+    { person: 'Larry Page', achievement: 'built a working printer from Legos', age: 12 },
+    { person: 'Sergey Brin', achievement: 'immigrated to the U.S. and learned programming', age: 6 },
+    { person: 'Jeff Bezos', achievement: 'won the state science fair', age: 18 },
+    { person: 'Reid Hoffman', achievement: 'co-founded LinkedIn', age: 36 },
+    { person: 'Travis Kalanick', achievement: 'dropped out of UCLA to start his first company', age: 21 },
+    { person: 'Brian Chesky', achievement: 'founded Airbnb', age: 27 },
+    { person: 'Drew Houston', achievement: 'founded Dropbox', age: 24 },
+    { person: 'Kevin Systrom', achievement: 'created Instagram', age: 27 },
+    { person: 'Evan Spiegel', achievement: 'co-founded Snapchat', age: 21 },
+    { person: 'Whitney Wolfe Herd', achievement: 'founded Bumble', age: 24 },
+    { person: 'Sara Blakely', achievement: 'founded Spanx', age: 29 },
+    { person: 'Coco Chanel', achievement: 'opened her first boutique', age: 27 },
+    { person: 'Walt Disney', achievement: 'drew cartoons for his school paper', age: 16 },
+    { person: 'Steven Spielberg', achievement: 'made his first short film', age: 12 },
+    { person: 'Quentin Tarantino', achievement: 'wrote his first screenplay', age: 14 },
+    { person: 'Christopher Nolan', achievement: 'made his first short film', age: 7 },
+    { person: 'Ava DuVernay', achievement: 'directed her first feature film', age: 40 },
+    { person: 'Jordan Peele', achievement: 'released Get Out', age: 38 },
+    { person: 'Greta Gerwig', achievement: 'wrote and directed Lady Bird', age: 34 },
+    { person: 'Emma Stone', achievement: 'moved to LA to pursue acting', age: 15 },
+    { person: 'Jennifer Lawrence', achievement: 'was nominated for an Oscar', age: 22 },
+    { person: 'Dakota Fanning', achievement: 'starred in I Am Sam', age: 7 },
+    { person: 'Hailee Steinfeld', achievement: 'was nominated for an Oscar for True Grit', age: 14 },
+    { person: 'Florence Welch', achievement: 'formed Florence and the Machine', age: 21 },
+    { person: 'Lorde', achievement: 'released Royals', age: 16 },
+    { person: 'Dua Lipa', achievement: 'moved to London to become a singer', age: 15 },
+    { person: 'H.E.R.', achievement: 'signed her first record deal', age: 14 },
+    { person: 'Doja Cat', achievement: 'released her first single', age: 20 },
+    { person: 'Megan Thee Stallion', achievement: 'released her first mixtape', age: 21 },
+    { person: 'Lizzo', achievement: 'moved to Minneapolis to pursue music', age: 21 },
+    { person: 'Ruth Bader Ginsburg', achievement: 'graduated first in her class from Cornell', age: 21 },
+    { person: 'Sonia Sotomayor', achievement: 'graduated from Princeton', age: 22 },
+    { person: 'Amanda Gorman', achievement: 'became the first National Youth Poet Laureate', age: 19 },
+    { person: 'Malcolm X', achievement: 'gave his first major speech', age: 27 },
+    { person: 'Martin Luther King Jr.', achievement: 'entered college', age: 15 },
+    { person: 'Rosa Parks', achievement: 'joined the NAACP', age: 43 },
+    { person: 'Frida Kahlo', achievement: 'painted her first self-portrait', age: 18 },
+    { person: 'Yayoi Kusama', achievement: 'moved to New York to pursue art', age: 29 },
+    { person: 'Banksy', achievement: 'started making street art in Bristol', age: 14 },
+    { person: 'Takashi Murakami', achievement: 'studied Nihonga painting in Tokyo', age: 22 },
+    { person: 'Jean-Michel Basquiat', achievement: 'sold his first painting', age: 19 },
+    { person: 'Andy Warhol', achievement: 'had his first solo exhibition', age: 34 },
+    { person: 'J.K. Rowling', achievement: 'wrote the first draft of Harry Potter', age: 25 },
+    { person: 'Stephen King', achievement: 'sold his first story', age: 18 },
+    { person: 'Octavia Butler', achievement: 'won her first Hugo Award', age: 37 },
+    { person: 'Neil Gaiman', achievement: 'wrote his first professional piece', age: 22 },
+    { person: 'Ta-Nehisi Coates', achievement: 'published his first book', age: 33 },
+    { person: 'Rupi Kaur', achievement: 'self-published Milk and Honey', age: 21 },
+    { person: 'Elizabeth Gilbert', achievement: 'published her first short story', age: 19 },
+    { person: 'Chimamanda Ngozi Adichie', achievement: 'published her first play', age: 19 },
+    { person: 'Zadie Smith', achievement: 'published White Teeth', age: 24 },
+    { person: 'Celeste Ng', achievement: 'published Everything I Never Told You', age: 34 },
+    { person: 'Angie Thomas', achievement: 'published The Hate U Give', age: 29 },
+    { person: 'Jason Reynolds', achievement: 'published his first novel', age: 24 },
+    { person: 'John Green', achievement: 'published Looking for Alaska', age: 31 },
+    { person: 'Mindy Kaling', achievement: 'was hired as a writer on The Office', age: 24 },
+    { person: 'Lin-Manuel Miranda', achievement: 'wrote the first draft of In the Heights', age: 19 },
+    { person: 'Lin-Manuel Miranda', achievement: 'won a Tony for Hamilton', age: 36 },
+    { person: 'Dave Chappelle', achievement: 'performed his first stand-up set', age: 14 },
+    { person: 'Tina Fey', achievement: 'joined Saturday Night Live', age: 27 },
+    { person: 'Amy Poehler', achievement: 'founded the Upright Citizens Brigade', age: 24 },
+    { person: 'Trevor Noah', achievement: 'hosted his first TV show in South Africa', age: 24 },
+    { person: 'Hasan Minhaj', achievement: 'joined The Daily Show', age: 29 },
+    { person: 'John Legend', achievement: 'sang in his church choir', age: 4 },
+    { person: 'Alicia Keys', achievement: 'signed her first record deal', age: 15 },
+    { person: 'Ariana Grande', achievement: 'starred on Broadway in 13', age: 15 },
+    { person: 'Selena Gomez', achievement: 'starred on Barney & Friends', age: 10 },
+    { person: 'Demi Lovato', achievement: 'starred in Camp Rock', age: 15 },
+    { person: 'Miley Cyrus', achievement: 'landed the role of Hannah Montana', age: 12 },
+    { person: 'Nicki Minaj', achievement: 'released her first mixtape', age: 24 },
+    { person: 'Cardi B', achievement: 'went viral on Vine and Instagram', age: 22 },
+    { person: 'Kendrick Lamar', achievement: 'released his first mixtape', age: 16 },
+    { person: 'Drake', achievement: 'starred on Degrassi', age: 15 },
+    { person: 'Post Malone', achievement: 'released White Iverson', age: 20 },
+    { person: 'Travis Scott', achievement: 'released his first mixtape', age: 20 },
+    { person: 'Billie Joe Armstrong', achievement: 'formed Green Day', age: 14 },
+    { person: 'Kurt Cobain', achievement: 'formed his first band', age: 14 },
+    { person: 'Dave Grohl', achievement: 'joined Nirvana', age: 21 },
+    { person: 'Hayley Williams', achievement: 'formed Paramore', age: 15 },
+    { person: 'Halsey', achievement: 'posted her first song on Tumblr', age: 18 },
+    { person: 'Lil Nas X', achievement: 'released Old Town Road', age: 19 },
+    { person: 'Claudia Conway', achievement: 'went viral for her political activism', age: 15 },
+    { person: 'Marley Dias', achievement: 'started the #1000BlackGirlBooks campaign', age: 11 },
+    { person: 'Mikaila Ulmer', achievement: 'founded Me & the Bees Lemonade', age: 4 },
+    { person: 'Moziah Bridges', achievement: 'started Mo\'s Bows', age: 9 },
+    { person: 'Alina Morse', achievement: 'invented Zollipops sugar-free lollipops', age: 7 },
+    { person: 'Ryan Hickman', achievement: 'started a recycling business', age: 3 },
+    { person: 'Easton LaChappelle', achievement: 'built his first robotic arm', age: 14 },
+    { person: 'Jack Andraka', achievement: 'invented a cancer detection method', age: 15 },
+    { person: 'Kelvin Doe', achievement: 'built a radio station from scrap', age: 13 },
+    { person: 'Sylvia Todd', achievement: 'hosted a web show about science', age: 12 },
+    { person: 'Gitanjali Rao', achievement: 'was named Time Kid of the Year', age: 15 },
+  ];
 
   const BACKLOG_COLUMN_ID = '';
   const BACKLOG_COLUMN_COLOR = '#e2e8f0';
@@ -186,14 +335,32 @@
   }
 
   function getFilteredItems() {
+    return currentTrackerId ? items.filter((i) => i.trackerId === currentTrackerId) : items;
+  }
+
+  /** Apply date filter to a list of items by doneAt (for Done column only). */
+  function applyDoneDateFilter(list) {
     const filter = document.getElementById('date-filter').value;
-    let list = currentTrackerId ? items.filter((i) => i.trackerId === currentTrackerId) : items;
-    if (filter && filter !== 'all') {
-      const days = parseInt(filter, 10);
-      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
-      list = list.filter((i) => new Date(i.createdAt).getTime() >= cutoff);
+    if (!filter || filter === 'all') return list;
+    if (filter === 'this-week') {
+      const now = new Date();
+      const startOfWeek = new Date(now);
+      startOfWeek.setDate(now.getDate() - now.getDay());
+      startOfWeek.setHours(0, 0, 0, 0);
+      const endOfWeek = new Date(startOfWeek);
+      endOfWeek.setDate(startOfWeek.getDate() + 7);
+      return list.filter((i) => {
+        const at = i.doneAt || i.createdAt || '';
+        const t = new Date(at).getTime();
+        return t >= startOfWeek.getTime() && t < endOfWeek.getTime();
+      });
     }
-    return list;
+    const days = parseInt(filter, 10);
+    const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+    return list.filter((i) => {
+      const at = i.doneAt || i.createdAt || '';
+      return new Date(at).getTime() >= cutoff;
+    });
   }
 
   function getItemsForTracker(trackerId) {
@@ -291,12 +458,76 @@
     saveItems();
   }
 
+  function getDoneColumnId() {
+    const c = columns.find((col) => col.default === 'done' || col.id === 'done');
+    return c ? c.id : 'done';
+  }
+
+  function backfillDoneAt() {
+    const doneColId = getDoneColumnId();
+    let changed = false;
+    items.forEach((item) => {
+      if (item.status !== doneColId || item.doneAt) return;
+      const history = item.statusHistory || [];
+      const lastDone = history.filter((h) => h.to === doneColId).pop();
+      if (lastDone && lastDone.at) {
+        item.doneAt = lastDone.at;
+        changed = true;
+      } else {
+        item.doneAt = item.createdAt || new Date().toISOString();
+        changed = true;
+      }
+    });
+    if (changed) saveItems();
+  }
+
+  function priorityRank(p) {
+    if (!p || p === '') return 0;
+    const r = { critical: 4, high: 3, medium: 2, low: 1 }[p.toLowerCase()];
+    return r != null ? r : 0;
+  }
+
+  function sortColumnItems(colItems, isBacklog, doneColId, colId) {
+    if (colId === doneColId) return colItems;
+    return [...colItems].sort((a, b) => {
+      const aDue = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+      const bDue = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+      if (aDue !== bDue) return aDue - bDue;
+      return priorityRank(b.priority) - priorityRank(a.priority);
+    });
+  }
+
+  function getSortBy() {
+    const v = localStorage.getItem(STORAGE_SORT_BY);
+    return (v === 'default' || v === 'created' || v === 'priority' || v === 'name') ? v : 'default';
+  }
+
+  function applySortBy(colItems, sortBy) {
+    if (sortBy === 'default') return colItems;
+    const list = [...colItems];
+    if (sortBy === 'created') {
+      return list.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
+    }
+    if (sortBy === 'priority') {
+      return list.sort((a, b) => priorityRank(b.priority) - priorityRank(a.priority));
+    }
+    if (sortBy === 'name') {
+      return list.sort((a, b) => (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase()));
+    }
+    return list;
+  }
+
+  function setDoneAtIfDone(item, newStatus) {
+    if (newStatus === getDoneColumnId()) item.doneAt = nowISO();
+  }
+
   function setStatusWithHistory(itemId, newStatus) {
     const item = items.find((i) => i.id === itemId);
     if (!item) return;
     const prev = item.status || '';
     if (prev === newStatus) return;
     item.status = newStatus;
+    setDoneAtIfDone(item, newStatus);
     item.statusHistory = item.statusHistory || [];
     item.statusHistory.push({
       from: prev,
@@ -304,6 +535,16 @@
       at: nowISO(),
     });
     saveItems();
+  }
+
+  function deleteItem(itemId) {
+    items = items.filter((i) => i.id !== itemId);
+    saveItems();
+    document.getElementById('detail-modal').close();
+    document.getElementById('item-modal').close();
+    renderBoard();
+    renderBacklog();
+    if (mainView === 'board') renderWorkstreamPicker();
   }
 
   function renderBoard() {
@@ -325,9 +566,16 @@
 
       const isDefault = !isBacklog && DEFAULT_COLUMNS.some((d) => d.id === col.id);
       const columnIdForAdd = isBacklog ? BACKLOG_COLUMN_ID : col.id;
-      const count = isBacklog
-        ? filtered.filter((i) => isInBacklog(i)).length
-        : filtered.filter((i) => i.status === col.id && !isInBacklog(i)).length;
+      const doneColId = getDoneColumnId();
+      let count;
+      if (isBacklog) {
+        count = filtered.filter((i) => isInBacklog(i)).length;
+      } else if (col.id === doneColId) {
+        const doneItems = filtered.filter((i) => i.status === col.id && !isInBacklog(i));
+        count = applyDoneDateFilter(doneItems).length;
+      } else {
+        count = filtered.filter((i) => i.status === col.id && !isInBacklog(i)).length;
+      }
       colEl.innerHTML = `
         <div class="column-header" style="background: ${col.color || 'var(--bg-card)'}; color: inherit;">
           <span class="column-name">${escapeHtml(col.name)} <span class="column-count">(${count})</span></span>
@@ -344,9 +592,24 @@
       `;
 
       const cardsContainer = colEl.querySelector('.column-cards');
-      const colItems = isBacklog
+      let colItems = isBacklog
         ? filtered.filter((i) => isInBacklog(i))
         : filtered.filter((i) => i.status === col.id && !isInBacklog(i));
+      if (!isBacklog && col.id === doneColId) colItems = applyDoneDateFilter(colItems);
+      const sortBy = getSortBy();
+      if (sortBy === 'default') {
+        if (!isBacklog && col.id === doneColId) {
+          colItems = [...colItems].sort((a, b) => {
+            const aAt = a.doneAt || '';
+            const bAt = b.doneAt || '';
+            return aAt > bAt ? -1 : aAt < bAt ? 1 : 0;
+          });
+        } else {
+          colItems = sortColumnItems(colItems, isBacklog, doneColId, col.id === BACKLOG_COLUMN_ID ? '' : col.id);
+        }
+      } else {
+        colItems = applySortBy(colItems, sortBy);
+      }
       colItems.forEach((item) => cardsContainer.appendChild(createCard(item)));
 
       setupColumnDrop(cardsContainer, isBacklog ? BACKLOG_COLUMN_ID : col.id);
@@ -371,13 +634,16 @@
     div.className = 'card';
     div.draggable = true;
     div.dataset.itemId = item.id;
+    const isDone = item.status === getDoneColumnId();
+    const dateLabel = isDone ? `Done ${formatDate(item.doneAt || item.createdAt)}` : `Created ${formatDate(item.createdAt)}`;
+    const showDue = item.dueDate && !isDone;
     div.innerHTML = `
       ${item.priority ? `<div class="card-priority-header" data-priority="${escapeAttr(item.priority)}">${escapeHtml(item.priority)}</div>` : ''}
       <div class="card-body">
         <div class="card-name">${escapeHtml(item.name || 'Untitled')}</div>
         <div class="card-meta">
-          <span class="card-created">Created ${formatDate(item.createdAt)}</span>
-          ${item.dueDate ? `<span class="card-due">Due ${formatDate(item.dueDate)}</span>` : ''}
+          <span class="card-created">${dateLabel}</span>
+          ${showDue ? `<span class="card-due">Due ${formatDate(item.dueDate)}</span>` : ''}
         </div>
       </div>
     `;
@@ -430,6 +696,7 @@
     if (!item) return;
     const prev = item.status || '';
     item.status = columnId;
+    setDoneAtIfDone(item, columnId);
     item.statusHistory = item.statusHistory || [];
     item.statusHistory.push({ from: prev, to: columnId, at: nowISO() });
     saveItems();
@@ -459,7 +726,13 @@
   function renderBacklog() {
     const list = document.getElementById('backlog-list');
     const filtered = getFilteredItems();
-    const backlogItems = filtered.filter((i) => isInBacklog(i));
+    let backlogItems = filtered.filter((i) => isInBacklog(i));
+    const sortBy = getSortBy();
+    if (sortBy === 'default') {
+      backlogItems = sortColumnItems(backlogItems, true, getDoneColumnId(), '');
+    } else {
+      backlogItems = applySortBy(backlogItems, sortBy);
+    }
     list.innerHTML = '';
     list.classList.remove('drag-over');
     backlogItems.forEach((item) => list.appendChild(createCard(item)));
@@ -495,6 +768,7 @@
     document.getElementById('modal-title').textContent = 'Add item';
     document.getElementById('item-form').reset();
     document.getElementById('item-id').value = '';
+    document.getElementById('item-delete').style.display = 'none';
     const statusSelect = document.getElementById('item-status');
     const sorted = [...columns].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     statusSelect.innerHTML = '<option value="">— Backlog (no status) —</option>' +
@@ -513,6 +787,11 @@
     if (!item) return;
     document.getElementById('modal-title').textContent = 'Edit item';
     document.getElementById('item-id').value = item.id;
+    const deleteBtn = document.getElementById('item-delete');
+    deleteBtn.style.display = 'inline-block';
+    deleteBtn.onclick = () => {
+      if (confirm('Delete this item? This cannot be undone.')) deleteItem(itemId);
+    };
     document.getElementById('item-name').value = item.name || '';
     document.getElementById('item-priority').value = item.priority || '';
     document.getElementById('item-notes').value = item.notes || '';
@@ -550,6 +829,15 @@
     } else {
       detailDueEl.textContent = '';
       detailDueEl.style.display = 'none';
+    }
+    const detailDoneEl = document.getElementById('detail-done');
+    const isInDone = item.status === getDoneColumnId();
+    if (isInDone) {
+      detailDoneEl.textContent = `Done ${formatDate(item.doneAt || item.createdAt)}`;
+      detailDoneEl.style.display = '';
+    } else {
+      detailDoneEl.textContent = '';
+      detailDoneEl.style.display = 'none';
     }
     document.getElementById('detail-notes').textContent = item.notes || '—';
     document.getElementById('detail-notes-wrap').style.display = item.notes ? 'block' : 'none';
@@ -602,6 +890,9 @@
     document.getElementById('detail-edit').onclick = () => {
       document.getElementById('detail-modal').close();
       openEditModal(itemId);
+    };
+    document.getElementById('detail-delete').onclick = () => {
+      if (confirm('Delete this item? This cannot be undone.')) deleteItem(itemId);
     };
     document.getElementById('detail-modal').showModal();
   }
@@ -663,7 +954,7 @@
         }
       }
     } else {
-      items.push({
+      const newItem = {
         id: generateId(),
         trackerId: currentTrackerId || trackers[0]?.id,
         name,
@@ -676,7 +967,9 @@
         createdAt: nowISO(),
         statusHistory: status ? [{ from: '', to: status, at: nowISO() }] : [],
         changelog: [],
-      });
+      };
+      if (status === getDoneColumnId()) newItem.doneAt = nowISO();
+      items.push(newItem);
     }
     saveItems();
     document.getElementById('item-modal').close();
@@ -856,12 +1149,14 @@
       ...sortedColumns.map((c) => ({ label: c.name, count: m.byStatus[c.id] || 0, color: c.color || '#c4b5fd' })),
     ];
     const total = segments.reduce((s, x) => s + x.count, 0);
-    const legendRows = segments.map((s) =>
-      `<div class="dashboard-donut-legend-row">
-        <span class="dashboard-donut-legend-label">${escapeHtml(s.label)}</span>
-        <span class="dashboard-donut-legend-count">${s.count}</span>
-      </div>`
-    ).join('');
+    const barRows = segments.map((s) => {
+      const pct = total ? (s.count / total) * 100 : 0;
+      return `<div class="dashboard-bar-row">
+        <span class="dashboard-bar-label" title="${escapeAttr(s.label)}">${escapeHtml(s.label)}</span>
+        <div class="dashboard-bar-track"><div class="dashboard-bar-fill" style="width: ${pct}%; background: ${escapeAttr(s.color)};"></div></div>
+        <span class="dashboard-bar-count">${s.count}</span>
+      </div>`;
+    }).join('');
     let donutStyle = 'background: var(--border);';
     if (total > 0) {
       let acc = 0;
@@ -875,7 +1170,7 @@
     }
     return `
       <div class="dashboard-charts">
-        <div class="dashboard-donut-legend">${legendRows}</div>
+        <div class="dashboard-bars">${barRows}</div>
         <div class="dashboard-donut-wrap">
           <div class="dashboard-donut" style="${donutStyle}"></div>
         </div>
@@ -893,6 +1188,18 @@
         <div class="dashboard-kpi-box kpi-todo"><span class="dashboard-kpi-label">TO DO</span><span class="dashboard-kpi-value">${agg.todo}</span></div>
         <div class="dashboard-kpi-box kpi-progress"><span class="dashboard-kpi-label">IN PROGRESS</span><span class="dashboard-kpi-value">${agg.inProgress}</span></div>
         <div class="dashboard-kpi-box kpi-done"><span class="dashboard-kpi-label">DONE</span><span class="dashboard-kpi-value">${agg.done}</span></div>
+      `;
+    }
+    const inspirationEl = document.getElementById('dashboard-inspiration-wrap');
+    if (inspirationEl && INSPIRATIONAL_FACTS.length > 0) {
+      const hoursSinceEpoch = Math.floor(Date.now() / (1000 * 60 * 60));
+      const fact = INSPIRATIONAL_FACTS[hoursSinceEpoch % INSPIRATIONAL_FACTS.length];
+      const text = `Did you know ${fact.person} ${fact.achievement} at age ${fact.age}? What are you gonna do?`;
+      inspirationEl.innerHTML = `
+        <div class="dashboard-inspiration">
+          <span class="dashboard-inspiration-icon" aria-hidden="true">✨</span>
+          <p class="dashboard-inspiration-quote">${escapeHtml(text)}</p>
+        </div>
       `;
     }
     const grid = document.getElementById('dashboard-grid');
@@ -988,17 +1295,23 @@
     }
     dropdown.innerHTML = trackers.map((t) => {
       const isSelected = t.id === currentTrackerId;
-      return `<button type="button" class="workstream-picker-item ${isSelected ? 'selected' : ''}" data-tracker-id="${escapeAttr(t.id)}" role="option" aria-selected="${isSelected}">
-        <span class="workstream-picker-item-color" style="background: ${escapeAttr(t.color || DEFAULT_TRACKER_COLOR)};"></span>
-        <span>${escapeHtml(t.name)}</span>
-      </button>`;
+      return `<div class="workstream-picker-row" data-tracker-id="${escapeAttr(t.id)}">
+        <button type="button" class="workstream-picker-item ${isSelected ? 'selected' : ''}" data-tracker-id="${escapeAttr(t.id)}" role="option" aria-selected="${isSelected}">
+          <span class="workstream-picker-item-color" style="background: ${escapeAttr(t.color || DEFAULT_TRACKER_COLOR)};"></span>
+          <span class="workstream-picker-item-name">${escapeHtml(t.name)}</span>
+        </button>
+        <button type="button" class="workstream-picker-item-edit-btn" title="Edit workstream" data-tracker-id="${escapeAttr(t.id)}" aria-label="Edit workstream">✏️</button>
+      </div>`;
     }).join('') + `<button type="button" class="workstream-picker-item workstream-picker-add" data-action="add-workstream" role="option">
       <span class="workstream-picker-item-color" style="background: transparent; border: 1px dashed var(--border);"></span>
       <span>+ Add workstream</span>
     </button>`;
-    dropdown.querySelectorAll('.workstream-picker-item[data-tracker-id]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        currentTrackerId = btn.dataset.trackerId || null;
+    dropdown.querySelectorAll('.workstream-picker-row').forEach((row) => {
+      const trackerId = row.dataset.trackerId;
+      const mainBtn = row.querySelector('.workstream-picker-item');
+      const editBtn = row.querySelector('.workstream-picker-item-edit-btn');
+      mainBtn.addEventListener('click', () => {
+        currentTrackerId = trackerId || null;
         saveTrackers();
         document.getElementById('workstream-picker').classList.remove('open');
         document.getElementById('workstream-picker-trigger').setAttribute('aria-expanded', 'false');
@@ -1007,6 +1320,17 @@
         renderBoard();
         renderBacklog();
       });
+      if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const tracker = trackers.find((tr) => tr.id === trackerId);
+          if (tracker) {
+            document.getElementById('workstream-picker').classList.remove('open');
+            document.getElementById('workstream-picker-trigger').setAttribute('aria-expanded', 'false');
+            openEditTrackerModal(tracker);
+          }
+        });
+      }
     });
     const addBtn = dropdown.querySelector('.workstream-picker-add');
     if (addBtn) {
@@ -1123,6 +1447,7 @@
     migrateItemsToTrackers();
     migrateChangelogResourcesToLinks();
     loadColumns();
+    backfillDoneAt();
     initTheme();
     setupBacklogDrop();
 
@@ -1150,10 +1475,6 @@
       });
     });
     setupWorkstreamPicker();
-    document.getElementById('edit-current-tracker-btn').addEventListener('click', () => {
-      const t = trackers.find((tr) => tr.id === currentTrackerId);
-      if (t) openEditTrackerModal(t);
-    });
     document.getElementById('tracker-delete').addEventListener('click', (e) => {
       const id = e.target.dataset.trackerId;
       if (id) openDeleteTrackerModal(id);
@@ -1176,6 +1497,18 @@
     document.getElementById('detail-close').addEventListener('click', () => document.getElementById('detail-modal').close());
     document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
     document.getElementById('date-filter').addEventListener('change', () => { renderBoard(); renderBacklog(); });
+    const sortByEl = document.getElementById('sort-by');
+    if (sortByEl) {
+      sortByEl.value = getSortBy();
+      sortByEl.addEventListener('change', () => {
+        const v = sortByEl.value;
+        if (v === 'default' || v === 'created' || v === 'priority' || v === 'name') {
+          localStorage.setItem(STORAGE_SORT_BY, v);
+          renderBoard();
+          renderBacklog();
+        }
+      });
+    }
 
     let importFile = null;
     const importModal = document.getElementById('import-modal');
@@ -1210,7 +1543,10 @@
         if (action === 'add-item') openAddModal();
         else if (action === 'add-column') openColumnModal(null);
         else if (action === 'add-workstream') openAddTrackerModal();
-        else if (action === 'export') exportData();
+        else if (action === 'edit-workstream') {
+          const t = trackers.find((tr) => tr.id === currentTrackerId);
+          if (t) openEditTrackerModal(t);
+        } else if (action === 'export') exportData();
         else if (action === 'import') openImportModal();
       });
       document.addEventListener('click', () => {
